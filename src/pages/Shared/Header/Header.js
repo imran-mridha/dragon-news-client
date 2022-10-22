@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Button, Image } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { FaUserAlt } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../contexts/AuthProvider/AuthProvider';
 import LeftSideNav from '../LeftSideNav/LeftSideNav';
 
 const Header = () => {
+  const { user, logOut } = useContext(AuthContext);
+
+  const navigate = useNavigate()
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        navigate('/login')
+      })
+      .catch(error => console.error(error))
+  }
   return (
     <Navbar className='mb-4' collapseOnSelect expand="lg" bg="light" variant="light">
       <Container>
-        <Navbar.Brand href="#home">Dragon News</Navbar.Brand>
+        <Navbar.Brand><Link to='/'>Dragon News</Link></Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
@@ -28,10 +42,38 @@ const Header = () => {
             </NavDropdown>
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">More deets</Nav.Link>
-            <Nav.Link eventKey={2} href="#memes">
-              Dank memes
+            <Nav.Link href="#deets">
+
+              {
+                user?.uid ?
+                  <>
+                    <span className='mx-3'>{user?.displayName}</span>
+                    <Link to='/profile'>
+                      {user && user.photoURL ?
+
+                        <Image style={{ height: '30px' }} roundedCircle src={user.photoURL} />
+                        :
+                        <FaUserAlt />
+                      }
+                    </Link>
+
+                    <Button onClick={handleLogOut} variant="outline-dark" className='mx-3'>LogOut</Button>
+                  </>
+                  :
+                  <>
+                    <Link to='/register'>
+                      <Button variant="outline-primary">Register</Button>
+                    </Link>
+                    <Link to='/login'>
+                      <Button variant="outline-dark" className='mx-3'>Login</Button>
+                    </Link>
+                  </>
+              }
+
             </Nav.Link>
+            {/* <Nav.Link eventKey={2} href="#memes">
+
+            </Nav.Link> */}
           </Nav>
           <div className='d-lg-none'>
             <LeftSideNav />
